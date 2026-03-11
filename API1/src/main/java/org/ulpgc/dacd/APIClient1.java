@@ -1,4 +1,4 @@
 package org.ulpgc.dacd;
 
-public class APIService {
+public class APIClient1 {
 }
