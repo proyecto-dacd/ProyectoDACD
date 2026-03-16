@@ -1,4 +1,4 @@
 package org.ulpgc.dacd.model;
 
-public class APIData2 {
+public class ScrapingData2 {
 }
