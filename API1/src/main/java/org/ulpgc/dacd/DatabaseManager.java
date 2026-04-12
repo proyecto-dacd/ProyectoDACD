@@ -1,12 +1,12 @@
 package org.ulpgc.dacd;
 
-import org.ulpgc.dacd.model.APIData1;
+import org.ulpgc.dacd.model.CoinGeckoCurrency;
 import java.sql.*;
 
-public class SQLiteManager {
+public class DatabaseManager {
     private final String url;
 
-    public SQLiteManager(String dbPath) {
+    public DatabaseManager(String dbPath) {
         this.url = "jdbc:sqlite:" + dbPath;
         initializeDatabase();
     }
@@ -19,8 +19,8 @@ public class SQLiteManager {
                 price REAL,
                 volume INTEGER,
                 market_cap INTEGER,
-                timestamp TEXT,
-                PRIMARY KEY (id, timestamp)
+                last_update TEXT,
+                PRIMARY KEY (id, last_update)
             );
         """;
 
@@ -33,8 +33,8 @@ public class SQLiteManager {
         }
     }
 
-    public void save(APIData1 data) {
-        String sql = "INSERT INTO crypto_data (id, rank, price, volume, market_cap, timestamp) VALUES (?, ?, ?, ?, ?, ?)";
+    public void save(CoinGeckoCurrency data) {
+        String sql = "INSERT INTO crypto_data (id, rank, price, volume, market_cap, last_update) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(url);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -44,7 +44,7 @@ public class SQLiteManager {
             pstmt.setDouble(3, data.getPrice());
             pstmt.setLong(4, data.getVolume());
             pstmt.setLong(5, data.getMarketCap());
-            pstmt.setString(6, data.getTimestamp());
+            pstmt.setString(6, data.getLast_update());
 
             pstmt.executeUpdate();
         } catch (SQLException e) {

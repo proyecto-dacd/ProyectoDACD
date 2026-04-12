@@ -1,20 +1,20 @@
 package org.ulpgc.dacd.model;
 
-public class APIData1 {
+public class CoinGeckoCurrency {
     private final String id;
     private final double price;
     private final long volume;
     private final long marketCap;
-    private final String timestamp;
+    private final String last_update;
     private final int marketCapRank;
 
-    public APIData1(String id, double price, long volume, long marketCap, int marketCapRank, String timestamp) {
+    public CoinGeckoCurrency(String id, double price, long volume, long marketCap, int marketCapRank, String last_update) {
         this.id = id;
         this.price = price;
         this.volume = volume;
         this.marketCap = marketCap;
         this.marketCapRank = marketCapRank;
-        this.timestamp = timestamp;
+        this.last_update = last_update;
     }
 
     public String getId() {
@@ -33,8 +33,8 @@ public class APIData1 {
         return marketCap;
     }
 
-    public String getTimestamp() {
-        return timestamp;
+    public String getLast_update() {
+        return last_update;
     }
 
     public int getMarketCapRank() {
@@ -49,7 +49,7 @@ public class APIData1 {
                 ", price=" + price +
                 ", volume=" + volume +
                 ", marketCap=" + marketCap +
-                ", timestamp='" + timestamp + '\'' +
+                ", last_update'" + last_update + '\'' +
                 '}';
     }
 }

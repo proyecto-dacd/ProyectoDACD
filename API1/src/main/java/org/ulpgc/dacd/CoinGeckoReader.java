@@ -5,26 +5,26 @@ import okhttp3.Request;
 import okhttp3.Response;
 import java.io.IOException;
 
-public class APIClient1 {
+public class CoinGeckoReader {
 
     private static final String BASE_URL = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=false";
 
-    private final OkHttpClient client;
+    private final OkHttpClient httpClient;
     private final String apiKey;
 
-    public APIClient1(String apiKey) {
-        this.client = new OkHttpClient();
+    public CoinGeckoReader(OkHttpClient httpClient, String apiKey) {
+        this.httpClient = httpClient;
         this.apiKey = apiKey;
     }
 
-    public String getRawJson(String cryptoId) {
+    public String getRawJson() {
         String url = BASE_URL + "&x_cg_demo_api_key=" + this.apiKey;
 
         Request request = new Request.Builder()
                 .url(url)
                 .build();
 
-        try (Response response = client.newCall(request).execute()) {
+        try (Response response = httpClient.newCall(request).execute()) {
             if (response.isSuccessful() && response.body() != null) {
                 return response.body().string();
             } else {
