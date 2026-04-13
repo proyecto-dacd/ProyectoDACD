@@ -3,20 +3,21 @@ package org.ulpgc.dacd;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.ulpgc.dacd.model.CoinGeckoCurrency;
+import org.ulpgc.dacd.model.Currency;
+import org.ulpgc.dacd.model.CurrencyDatabase;
 
 import java.io.File;
 import java.sql.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DatabaseManagerTest {
-    private DatabaseManager manager;
+class CurrencyDatabaseTest {
+    private CurrencyDatabase manager;
     private final String TEST_DB = "test_cryptos.db";
 
     @BeforeEach
     void setUp() {
-        manager = new DatabaseManager(TEST_DB);
+        manager = new CurrencyDatabase(TEST_DB);
     }
 
     @AfterEach
@@ -29,7 +30,7 @@ class DatabaseManagerTest {
 
     @Test
     void testSaveAndRetrieveData() {
-        CoinGeckoCurrency testData = new CoinGeckoCurrency("bitcoin", 50000.0, 1000000L, 900000000L, 1, "2026-03-27 12:00:00");
+        Currency testData = new Currency("bitcoin", 50000.0, 1000000L, 900000000L, 1, "2026-03-27 12:00:00");
 
         manager.save(testData);
 

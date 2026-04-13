@@ -1,12 +1,11 @@
-package org.ulpgc.dacd;
+package org.ulpgc.dacd.model;
 
-import org.ulpgc.dacd.model.CoinGeckoCurrency;
 import java.sql.*;
 
-public class DatabaseManager {
+public class CurrencyDatabase {
     private final String url;
 
-    public DatabaseManager(String dbPath) {
+    public CurrencyDatabase(String dbPath) {
         this.url = "jdbc:sqlite:" + dbPath;
         initializeDatabase();
     }
@@ -33,8 +32,8 @@ public class DatabaseManager {
         }
     }
 
-    public void save(CoinGeckoCurrency data) {
-        String sql = "INSERT INTO crypto_data (id, rank, price, volume, market_cap, last_update) VALUES (?, ?, ?, ?, ?, ?)";
+    public void save(Currency data) {
+        String sql = "INSERT OR REPLACE INTO crypto_data (id, rank, price, volume, market_cap, last_update) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(url);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

@@ -1,6 +1,6 @@
 package org.ulpgc.dacd.model;
 
-public class CoinGeckoCurrency {
+public class Currency {
     private final String id;
     private final double price;
     private final long volume;
@@ -8,7 +8,7 @@ public class CoinGeckoCurrency {
     private final String last_update;
     private final int marketCapRank;
 
-    public CoinGeckoCurrency(String id, double price, long volume, long marketCap, int marketCapRank, String last_update) {
+    public Currency(String id, double price, long volume, long marketCap, int marketCapRank, String last_update) {
         this.id = id;
         this.price = price;
         this.volume = volume;

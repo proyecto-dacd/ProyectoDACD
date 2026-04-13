@@ -3,7 +3,12 @@ package org.ulpgc.dacd;
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.ulpgc.dacd.control.CoinGeckoReader;
+import org.ulpgc.dacd.model.Currency;
+
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,12 +20,14 @@ class CoinGeckoReaderTest {
     @BeforeEach
     void setUp() {
         Properties properties = new Properties();
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
-            if (input != null) {
-                properties.load(input);
-                this.apiKey = properties.getProperty("api.key");
-            }
+
+        String absolutePath = "C:\\Users\\cmont\\IdeaProjects\\ProyectoDACD\\config.properties";
+
+        try (InputStream input = new FileInputStream(absolutePath)) {
+            properties.load(input);
+            this.apiKey = properties.getProperty("api.key");
         } catch (Exception e) {
+            System.err.println("Error fatal: No se encontró el archivo en " + absolutePath);
             this.apiKey = "";
         }
 
@@ -28,14 +35,17 @@ class CoinGeckoReaderTest {
     }
 
     @Test
-    void testGetRawJsonReturnsData() {
-        assertNotNull(apiKey, "La API Key no se pudo cargar del archivo properties");
-        assertFalse(apiKey.isEmpty(), "La API Key está vacía en el archivo properties");
+    void testReadCurrenciesReturnsData() {
+        assertNotNull(apiKey, "La API Key es null");
+        assertFalse(apiKey.isEmpty(), "La API Key está vacía");
 
-        CoinGeckoReader client = new CoinGeckoReader(httpClient, apiKey);
-        String jsonResult = client.getRawJson();
+        CoinGeckoReader reader = new CoinGeckoReader(httpClient, apiKey);
+        List<Currency> result = reader.readCurrencies();
 
-        assertNotNull(jsonResult, "El JSON no debería ser nulo");
-        assertTrue(jsonResult.contains("bitcoin"), "Debería contener datos de bitcoin");
+        assertNotNull(result, "La lista de monedas es nula");
+        assertFalse(result.isEmpty(), "La lista está vacía. ¿Tienes internet o la API Key es correcta?");
+
+        System.out.println("Test exitoso. Primera moneda detectada: " + result.get(0).getId());
+        assertNotNull(result.get(0).getId());
     }
 }
