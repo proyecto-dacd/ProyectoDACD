@@ -130,6 +130,7 @@ public class DecryptNewsFeeder implements NewsFeeder {
                 && !url.contains("/collections/")
                 && !url.contains("/university")
                 && !url.contains("/emerge")
+                && !url.contains("/price/")
                 && !url.endsWith(".jpg")
                 && !url.endsWith(".png")
                 && !url.endsWith(".webp")
