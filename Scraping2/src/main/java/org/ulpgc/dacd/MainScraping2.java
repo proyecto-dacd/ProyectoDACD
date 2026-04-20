@@ -1,6 +1,11 @@
 package org.ulpgc.dacd;
 
+import controller.NewsController;
+import feeder.DecryptNewsFeeder;
+import feeder.NewsFeeder;
 import org.ulpgc.dacd.database.DatabaseManager2;
+import serializer.DatabaseNewsSerializer;
+import serializer.NewsSerializer;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

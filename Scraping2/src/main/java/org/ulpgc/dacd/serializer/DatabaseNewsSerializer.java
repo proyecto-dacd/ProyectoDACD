@@ -1,4 +1,4 @@
-package org.ulpgc.dacd;
+package org.ulpgc.dacd.serializer;
 
 import org.ulpgc.dacd.database.DatabaseManager2;
 import org.ulpgc.dacd.model.NewsArticle;

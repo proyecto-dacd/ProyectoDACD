@@ -1,4 +1,4 @@
-package org.ulpgc.dacd;
+package org.ulpgc.dacd.feeder;
 
 import org.ulpgc.dacd.model.NewsArticle;
 import java.util.List;
