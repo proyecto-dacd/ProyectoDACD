@@ -13,7 +13,6 @@ public class CurrencyEvent {
         this.data = data;
     }
 
-    // Getters necesarios para que Gson pueda leerlos
     public String getTs() { return ts; }
     public String getSs() { return ss; }
     public Currency getData() { return data; }

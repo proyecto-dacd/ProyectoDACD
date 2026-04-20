@@ -1,10 +1,7 @@
 package org.ulpgc.dacd;
 
 import okhttp3.OkHttpClient;
-import org.ulpgc.dacd.control.CoinGeckoReader;
-import org.ulpgc.dacd.control.CurrencyController;
-import org.ulpgc.dacd.control.CurrencyReader;
-import org.ulpgc.dacd.model.CurrencyDatabase;
+import org.ulpgc.dacd.control.*;
 import org.ulpgc.dacd.view.ConsoleCurrencyView;
 import org.ulpgc.dacd.view.CurrencyView;
 
@@ -14,14 +11,14 @@ import java.util.Properties;
 
 public class Main {
     public static void main(String[] args) {
-        if (args.length < 2) {
-            System.err.println("Error: Faltan argumentos en la configuración de ejecución.");
-            System.err.println("Se esperaba: <ruta_config> <ruta_database>");
+        // Ahora solo necesitamos 1 argumento: la ruta de la API Key
+        if (args.length < 1) {
+            System.err.println("Error: Falta el argumento de la configuración.");
+            System.err.println("Se esperaba: <ruta_config_api_key>");
             return;
         }
 
         String configPath = args[0];
-        String dbPath = args[1];
 
         String apiKey = loadApiKeyFromPath(configPath);
         if (apiKey == null || apiKey.isEmpty()) {
@@ -31,12 +28,15 @@ public class Main {
 
         OkHttpClient httpClient = new OkHttpClient();
 
-        CurrencyReader reader = new CoinGeckoReader(httpClient, apiKey);
-        CurrencyDatabase database = new CurrencyDatabase(dbPath);
+        CurrencyReader reader = new CoinGeckoFeederReader(httpClient, apiKey);
+
+        CurrencyEventPublisher publisher = new ActiveMQFeederPublisher();
+
         CurrencyView view = new ConsoleCurrencyView();
 
-        CurrencyController controller = new CurrencyController(reader, database, view);
+        FeederController controller = new FeederController(reader, publisher, view);
 
+        System.out.println("Iniciando Feeder de Criptomonedas");
         controller.start();
     }
 
