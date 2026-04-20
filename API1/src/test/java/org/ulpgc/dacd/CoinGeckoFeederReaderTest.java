@@ -3,7 +3,7 @@ package org.ulpgc.dacd;
 import okhttp3.OkHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.ulpgc.dacd.control.CoinGeckoReader;
+import org.ulpgc.dacd.control.CoinGeckoFeederReader;
 import org.ulpgc.dacd.model.Currency;
 
 import java.io.FileInputStream;
@@ -13,7 +13,7 @@ import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CoinGeckoReaderTest {
+class CoinGeckoFeederReaderTest {
     private String apiKey;
     private OkHttpClient httpClient;
 
@@ -39,7 +39,7 @@ class CoinGeckoReaderTest {
         assertNotNull(apiKey, "La API Key es null");
         assertFalse(apiKey.isEmpty(), "La API Key está vacía");
 
-        CoinGeckoReader reader = new CoinGeckoReader(httpClient, apiKey);
+        CoinGeckoFeederReader reader = new CoinGeckoFeederReader(httpClient, apiKey);
         List<Currency> result = reader.readCurrencies();
 
         assertNotNull(result, "La lista de monedas es nula");

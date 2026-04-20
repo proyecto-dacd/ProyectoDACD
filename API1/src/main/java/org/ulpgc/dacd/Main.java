@@ -11,7 +11,6 @@ import java.util.Properties;
 
 public class Main {
     public static void main(String[] args) {
-        // Ahora solo necesitamos 1 argumento: la ruta de la API Key
         if (args.length < 1) {
             System.err.println("Error: Falta el argumento de la configuración.");
             System.err.println("Se esperaba: <ruta_config_api_key>");

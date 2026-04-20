@@ -26,9 +26,9 @@ public class CurrencyDatabase {
         try (Connection conn = DriverManager.getConnection(url);
              Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
-            System.out.println("Base de datos inicializada correctamente.");
+            System.out.println("✅ Base de datos inicializada correctamente.");
         } catch (SQLException e) {
-            System.err.println("Error al inicializar la base de datos: " + e.getMessage());
+            System.err.println("❌ Error al inicializar la base de datos: " + e.getMessage());
         }
     }
 
@@ -43,7 +43,7 @@ public class CurrencyDatabase {
             pstmt.setDouble(3, data.getPrice());
             pstmt.setLong(4, data.getVolume());
             pstmt.setLong(5, data.getMarketCap());
-            pstmt.setString(6, data.getLast_update());
+            pstmt.setString(6, data.getTs().toString());
 
             pstmt.executeUpdate();
         } catch (SQLException e) {

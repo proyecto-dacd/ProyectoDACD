@@ -1,20 +1,22 @@
 package org.ulpgc.dacd.model;
 
+import java.time.Instant;
+
 public class Currency {
     private final String id;
     private final double price;
     private final long volume;
     private final long marketCap;
-    private final String last_update;
+    private final Instant ts;
     private final int marketCapRank;
 
-    public Currency(String id, double price, long volume, long marketCap, int marketCapRank, String last_update) {
+    public Currency(String id, double price, long volume, long marketCap, int marketCapRank, Instant ts) {
         this.id = id;
         this.price = price;
         this.volume = volume;
         this.marketCap = marketCap;
         this.marketCapRank = marketCapRank;
-        this.last_update = last_update;
+        this.ts = ts;
     }
 
     public String getId() {
@@ -33,8 +35,8 @@ public class Currency {
         return marketCap;
     }
 
-    public String getLast_update() {
-        return last_update;
+    public Instant getTs() {
+        return ts;
     }
 
     public int getMarketCapRank() {
@@ -49,7 +51,7 @@ public class Currency {
                 ", price=" + price +
                 ", volume=" + volume +
                 ", marketCap=" + marketCap +
-                ", last_update'" + last_update + '\'' +
+                ", last_update'" + ts + '\'' +
                 '}';
     }
 }

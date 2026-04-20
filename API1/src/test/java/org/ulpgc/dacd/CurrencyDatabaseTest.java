@@ -8,6 +8,7 @@ import org.ulpgc.dacd.model.CurrencyDatabase;
 
 import java.io.File;
 import java.sql.*;
+import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,7 +31,9 @@ class CurrencyDatabaseTest {
 
     @Test
     void testSaveAndRetrieveData() {
-        Currency testData = new Currency("bitcoin", 50000.0, 1000000L, 900000000L, 1, "2026-03-27 12:00:00");
+        Instant testInstant = Instant.parse("2026-03-27T12:00:00Z");
+
+        Currency testData = new Currency("bitcoin", 50000.0, 1000000L, 900000000L, 1, testInstant);
 
         manager.save(testData);
 
@@ -44,7 +47,8 @@ class CurrencyDatabaseTest {
 
             assertEquals("bitcoin", rs.getString("id"));
             assertEquals(50000.0, rs.getDouble("price"));
-            assertEquals("2026-03-27 12:00:00", rs.getString("last_update"));
+
+            assertEquals(testInstant.toString(), rs.getString("last_update"));
 
         } catch (SQLException e) {
             fail("Error al verificar los datos en la DB: " + e.getMessage());
