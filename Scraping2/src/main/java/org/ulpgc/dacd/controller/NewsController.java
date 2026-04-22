@@ -1,8 +1,8 @@
 package org.ulpgc.dacd.controller;
 
-import feeder.NewsFeeder;
-import serializer.NewsSerializer;
+import org.ulpgc.dacd.feeder.NewsFeeder;
 import org.ulpgc.dacd.model.NewsArticle;
+import org.ulpgc.dacd.serializer.NewsSerializer;
 
 import java.util.List;
 
