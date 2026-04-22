@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.control;
+package org.ulpgc.dacd.feeder;
 
 import org.ulpgc.dacd.model.Currency;
 import java.util.List;

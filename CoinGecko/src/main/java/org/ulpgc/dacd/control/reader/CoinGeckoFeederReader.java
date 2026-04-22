@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.control;
+package org.ulpgc.dacd.feeder;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;

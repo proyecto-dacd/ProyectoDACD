@@ -9,7 +9,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class Main {
+public class MainFeeder {
     public static void main(String[] args) {
         if (args.length < 1) {
             System.err.println("Error: Falta el argumento de la configuración.");
