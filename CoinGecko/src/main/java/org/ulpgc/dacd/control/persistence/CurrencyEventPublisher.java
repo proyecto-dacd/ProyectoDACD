@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.feeder;
+package org.ulpgc.dacd.control.persistence;
 
 import org.ulpgc.dacd.model.CurrencyEvent;
 

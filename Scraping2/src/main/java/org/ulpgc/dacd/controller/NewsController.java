@@ -1,17 +1,16 @@
 package org.ulpgc.dacd.controller;
 
 import org.ulpgc.dacd.feeder.NewsFeeder;
+import org.ulpgc.dacd.model.CurrencyEvent;
 import org.ulpgc.dacd.model.NewsArticle;
-import org.ulpgc.dacd.model.NewsEvent;
 import org.ulpgc.dacd.publisher.ActiveMQNewsPublisher;
 import org.ulpgc.dacd.serializer.NewsSerializer;
 
-import java.time.Instant;
 import java.util.List;
 
 public class NewsController {
 
-    private static final String SOURCE_SYSTEM = "Scraping2-Decrypt";
+    private static final String SOURCE_SYSTEM = "CoinGecko-Scraping";
 
     private final NewsFeeder feeder;
     private final NewsSerializer serializer;
@@ -31,11 +30,7 @@ public class NewsController {
         for (NewsArticle article : articles) {
             serializer.serialize(article);
 
-            NewsEvent event = new NewsEvent(
-                    Instant.now().toString(),
-                    SOURCE_SYSTEM,
-                    article
-            );
+            CurrencyEvent event = new CurrencyEvent(article, SOURCE_SYSTEM);
 
             try {
                 publisher.publish(event);

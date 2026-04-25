@@ -1,9 +1,10 @@
-package org.ulpgc.dacd.feeder;
+package org.ulpgc.dacd.control.persistence;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.ulpgc.dacd.model.CurrencyEvent;
+import org.ulpgc.dacd.control.persistence.CurrencyEventPublisher;
 
 import javax.jms.*;
 import java.time.Instant;

@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.feeder;
+package org.ulpgc.dacd.control.reader;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -8,6 +8,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.ulpgc.dacd.model.Currency;
+import org.ulpgc.dacd.control.reader.CurrencyReader;
 
 import java.io.IOException;
 import java.time.Instant;

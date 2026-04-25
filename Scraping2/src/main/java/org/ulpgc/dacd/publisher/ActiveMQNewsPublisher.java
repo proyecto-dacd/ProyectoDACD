@@ -2,7 +2,7 @@ package org.ulpgc.dacd.publisher;
 
 import com.google.gson.Gson;
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.ulpgc.dacd.model.NewsEvent;
+import org.ulpgc.dacd.model.CurrencyEvent;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
@@ -19,7 +19,8 @@ public class ActiveMQNewsPublisher {
 
     private final Gson gson = new Gson();
 
-    public void publish(NewsEvent event) throws JMSException {
+    public void publish(CurrencyEvent event) throws JMSException {
+
         Connection connection = null;
         Session session = null;
         MessageProducer producer = null;
@@ -39,6 +40,9 @@ public class ActiveMQNewsPublisher {
             TextMessage message = session.createTextMessage(json);
 
             producer.send(message);
+
+            System.out.println("Evento publicado en ActiveMQ");
+
         } finally {
             if (producer != null) producer.close();
             if (session != null) session.close();

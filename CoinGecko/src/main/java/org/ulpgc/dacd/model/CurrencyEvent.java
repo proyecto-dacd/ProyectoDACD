@@ -5,9 +5,9 @@ import java.time.Instant;
 public class CurrencyEvent {
     private final String ts;
     private final String ss;
-    private final Currency data;
+    private final Object data;
 
-    public CurrencyEvent(Currency data, String source) {
+    public CurrencyEvent(Object data, String source) {
         this.ts = Instant.now().toString();
         this.ss = source;
         this.data = data;
@@ -15,5 +15,5 @@ public class CurrencyEvent {
 
     public String getTs() { return ts; }
     public String getSs() { return ss; }
-    public Currency getData() { return data; }
+    public Object getData() { return data; }
 }
