@@ -2,18 +2,25 @@ package org.ulpgc.dacd.controller;
 
 import org.ulpgc.dacd.feeder.NewsFeeder;
 import org.ulpgc.dacd.model.NewsArticle;
+import org.ulpgc.dacd.model.NewsEvent;
+import org.ulpgc.dacd.publisher.ActiveMQNewsPublisher;
 import org.ulpgc.dacd.serializer.NewsSerializer;
 
+import java.time.Instant;
 import java.util.List;
 
 public class NewsController {
 
+    private static final String SOURCE_SYSTEM = "Scraping2-Decrypt";
+
     private final NewsFeeder feeder;
     private final NewsSerializer serializer;
+    private final ActiveMQNewsPublisher publisher;
 
     public NewsController(NewsFeeder feeder, NewsSerializer serializer) {
         this.feeder = feeder;
         this.serializer = serializer;
+        this.publisher = new ActiveMQNewsPublisher();
     }
 
     public void execute() {
@@ -23,6 +30,19 @@ public class NewsController {
 
         for (NewsArticle article : articles) {
             serializer.serialize(article);
+
+            NewsEvent event = new NewsEvent(
+                    Instant.now().toString(),
+                    SOURCE_SYSTEM,
+                    article
+            );
+
+            try {
+                publisher.publish(event);
+                System.out.println("Evento publicado en ActiveMQ: " + article.getTitle());
+            } catch (Exception e) {
+                System.out.println("Error publicando evento en ActiveMQ: " + e.getMessage());
+            }
 
             System.out.println("---------------");
             System.out.println("Título: " + article.getTitle());
