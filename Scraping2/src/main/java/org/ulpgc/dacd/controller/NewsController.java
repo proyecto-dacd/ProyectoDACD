@@ -1,7 +1,7 @@
 package org.ulpgc.dacd.controller;
 
 import org.ulpgc.dacd.feeder.NewsFeeder;
-import org.ulpgc.dacd.model.CurrencyEvent;
+import org.ulpgc.dacd.scraping.model.CurrencyEvent;
 import org.ulpgc.dacd.model.NewsArticle;
 import org.ulpgc.dacd.publisher.ActiveMQNewsPublisher;
 import org.ulpgc.dacd.serializer.NewsSerializer;
