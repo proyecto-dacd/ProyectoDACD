@@ -13,12 +13,9 @@ import java.util.concurrent.TimeUnit;
 
 public class MainScraping2 {
     public static void main(String[] args) {
-        DatabaseManager2 databaseManager = new DatabaseManager2();
-        databaseManager.initializeDatabase();
 
         NewsFeeder feeder = new DecryptNewsFeeder();
-        NewsSerializer serializer = new DatabaseNewsSerializer();
-        NewsController controller = new NewsController(feeder, serializer);
+        NewsController controller = new NewsController(feeder);
 
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 

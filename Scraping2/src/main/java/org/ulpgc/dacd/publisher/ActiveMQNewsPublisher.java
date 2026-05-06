@@ -41,7 +41,7 @@ public class ActiveMQNewsPublisher {
 
             producer.send(message);
 
-            System.out.println("Evento publicado en ActiveMQ");
+            System.out.println(" Evento publicado desde " + event.getSs() + " a las " + event.getTs() );
 
         } finally {
             if (producer != null) producer.close();
