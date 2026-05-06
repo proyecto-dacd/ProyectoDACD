@@ -12,6 +12,7 @@
         <module>CoinGecko</module>
         <module>EventStoreBuilder</module>
         <module>Scraping2</module>
+        <module>BusinessUnit</module>
     </modules>
 
     <properties>
