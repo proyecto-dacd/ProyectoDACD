@@ -20,7 +20,6 @@ public class MainFeeder {
 
         if (args.length < 1) {
             System.err.println("Error: Falta el argumento de la configuración.");
-            System.err.println("Se esperaba: <ruta_config_api_key>");
             return;
         }
 
