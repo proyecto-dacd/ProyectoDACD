@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.feeder;
+package org.ulpgc.dacd.infrastructure.scraper;
 
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -235,23 +235,25 @@ public class DecryptNewsFeeder implements NewsFeeder {
         String normalizedText = text.toLowerCase();
         List<String> coins = new ArrayList<>();
 
-        addCoinIfPresent(coins, normalizedText, "BTC", "\\bbitcoin\\b", "\\bbtc\\b");
-        addCoinIfPresent(coins, normalizedText, "ETH", "\\bethereum\\b", "\\beth\\b", "\\bether\\b");
-        addCoinIfPresent(coins, normalizedText, "SOL", "\\bsolana\\b", "\\bsol\\b");
-        addCoinIfPresent(coins, normalizedText, "XRP", "\\bxrp\\b", "\\bripple\\b");
-        addCoinIfPresent(coins, normalizedText, "BNB", "\\bbnb\\b", "\\bbinance coin\\b");
+        addCoinIfPresent(coins, normalizedText, "bitcoin", "\\bbitcoin\\b", "\\bbtc\\b");
+        addCoinIfPresent(coins, normalizedText, "ethereum", "\\bethereum\\b", "\\beth\\b", "\\bether\\b");
+        addCoinIfPresent(coins, normalizedText, "solana", "\\bsolana\\b", "\\bsol\\b");
+        addCoinIfPresent(coins, normalizedText, "ripple", "\\bxrp\\b", "\\bripple\\b");
+        addCoinIfPresent(coins, normalizedText, "binancecoin", "\\bbnb\\b", "\\bbinance coin\\b");
 
         return coins;
     }
 
-    private void addCoinIfPresent(List<String> coins, String text, String code, String... patterns) {
+    private void addCoinIfPresent(List<String> coins, String text, String coinName, String... patterns) {
         for (String pattern : patterns) {
             if (java.util.regex.Pattern.compile(pattern).matcher(text).find()) {
-                if (!coins.contains(code)) {
-                    coins.add(code);
+                if (!coins.contains(coinName)) {
+                    coins.add(coinName);
                 }
                 return;
             }
         }
     }
+
+
 }

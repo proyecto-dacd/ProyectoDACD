@@ -1,8 +1,8 @@
-package org.ulpgc.dacd.publisher;
+package org.ulpgc.dacd.infrastructure.broker;
 
 import com.google.gson.Gson;
 import org.apache.activemq.ActiveMQConnectionFactory;
-import org.ulpgc.dacd.scraping.model.CurrencyEvent;
+import org.ulpgc.dacd.model.CurrencyEvent;
 
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;

@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.feeder;
+package org.ulpgc.dacd.infrastructure.scraper;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
