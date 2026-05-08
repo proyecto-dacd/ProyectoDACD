@@ -64,6 +64,28 @@ public class DatamartManager implements DatamartStore {
     }
 
     @Override
+    public void insertNews(CryptoNews cryptoNews) {
+        // Usamos INSERT OR IGNORE para evitar duplicados si la noticia ya existe (por la clave UNIQUE en published_at)
+        String sql = "INSERT OR IGNORE INTO crypto_news (crypto_id, title, url, published_at) VALUES (?, ?, ?, ?)";
+
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, cryptoNews.cryptoId());
+            pstmt.setString(2, cryptoNews.title());
+            pstmt.setString(3, cryptoNews.url());
+            pstmt.setString(4, cryptoNews.publishedAt());
+
+            int rows = pstmt.executeUpdate();
+            if (rows > 0) {
+                System.out.println("[Datamart] ✅ Noticia guardada: " + cryptoNews.title() + " [" + cryptoNews.cryptoId() + "]");
+            }
+        } catch (SQLException e) {
+            System.err.println("[Datamart] ❌ Error al insertar noticia en SQLite: " + e.getMessage());
+        }
+    }
+
+    @Override
     public List<String> getRelatedNews(String cryptoId) {
         List<String> newsList = new ArrayList<>();
         // Busca las últimas 3 noticias de esa criptomoneda

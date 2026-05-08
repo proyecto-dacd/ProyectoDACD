@@ -6,6 +6,9 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.ulpgc.dacd.model.CryptoPrice;
 import org.ulpgc.dacd.model.DatamartStore;
 import org.ulpgc.dacd.view.DashboardView;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import org.ulpgc.dacd.model.CryptoNews;
 
 import javax.jms.*;
 import java.util.HashMap;
@@ -110,6 +113,22 @@ public class RealTimeSubscriber {
 
                 // Actualizamos la memoria con el nuevo precio
                 lastPrices.put(id, currentPrice);
+
+            } else if (source.equals("Decrypt-Scraping")) {
+                // --- PARTE NUEVA PARA LAS NOTICIAS ---
+                String title = jsonObject.get("title").getAsString();
+                String url = jsonObject.get("url").getAsString();
+                String ts = jsonObject.get("ts").getAsString();
+                JsonArray coins = jsonObject.getAsJsonArray("coins");
+
+                // Una noticia puede hablar de varias monedas, iteramos sobre el array
+                for (JsonElement coin : coins) {
+                    String cryptoId = coin.getAsString(); // Ej: "bitcoin", "ethereum"
+
+                    // Creamos el record y lo guardamos en SQLite usando el método nuevo
+                    CryptoNews news = new CryptoNews(cryptoId, title, url, ts);
+                    datamartStore.insertNews(news);
+                }
             }
 
         } catch (Exception e) {
