@@ -31,7 +31,6 @@ public class RealTimeSubscriber {
         this.view = view;
     }
 
-    // --- NUEVO MÉTODO PARA CARGAR MEMORIA HISTÓRICA ---
     public void setInitialPrices(Map<String, Double> initialPrices) {
         this.lastPrices.putAll(initialPrices);
         System.out.println("[Subscriber] Memoria inicial cargada con " + initialPrices.size() + " precios históricos.");

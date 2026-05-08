@@ -15,8 +15,8 @@ public class MainBusinessUnit {
         // 1. Obtener la ruta del datalake por argumento
         String datalakePath;
         if (args.length > 0) {
-            datalakePath = args[0]; // Captura lo que el profe (o tú en el IDE) escriba, ej: "datalake"
-            System.out.println("📂 Ruta del datalake recibida por argumento: " + datalakePath);
+            datalakePath = args[0];
+            System.out.println("Ruta del datalake recibida por argumento: " + datalakePath);
         } else {
             // Plan B de seguridad por si se ejecuta sin argumentos
             datalakePath = "datalake";
@@ -31,22 +31,19 @@ public class MainBusinessUnit {
         HistoricalLoader historicalLoader = new HistoricalLoader(datamartStore);
         historicalLoader.loadHistoricalData(datalakePath);
 
-        // --- LA MAGIA: CONECTANDO EL PASADO CON EL PRESENTE ---
-
         // 4. Extraer el último estado conocido desde SQLite
         Map<String, CryptoPrice> initialData = datamartStore.getLatestPrices();
-        Map<String, Double> memoryPrices = new HashMap<>(); // Mapa temporal para el Subscriber
+        Map<String, Double> memoryPrices = new HashMap<>();
 
         // 5. Crear la Interfaz Gráfica (View)
         DashboardView dashboardView = new DashboardView();
 
-        // 6. Rellenar la tabla y preparar la memoria ANTES de mostrar la ventana
+        // 6. Rellenar la tabla y preparar la memoria antes de mostrar la ventana
         for (CryptoPrice cp : initialData.values()) {
             dashboardView.updatePrice(cp.id(), cp.price(), cp.timestamp());
             memoryPrices.put(cp.id(), cp.price());
         }
 
-        // Ahora sí, enseñamos la ventana (¡ya aparecerá llena de datos!)
         dashboardView.setVisible(true);
 
         // 7. Arrancar el Controlador, pasándole la base de datos y la vista
