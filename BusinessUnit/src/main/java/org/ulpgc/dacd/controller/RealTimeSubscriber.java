@@ -23,12 +23,18 @@ public class RealTimeSubscriber {
     private final DashboardView view; // Variable para controlar la interfaz gráfica
 
     // VARIABLES PARA EL VALOR AÑADIDO
-    private static final double VOLATILITY_THRESHOLD = 0.0; // Umbral del 1% (en 0.0 para pruebas)
+    private static final double VOLATILITY_THRESHOLD = 0.01; // Umbral del 1% (en 0.0 para pruebas)
     private final Map<String, Double> lastPrices = new HashMap<>();
 
     public RealTimeSubscriber(DatamartStore datamartStore, DashboardView view) {
         this.datamartStore = datamartStore;
         this.view = view;
+    }
+
+    // --- NUEVO MÉTODO PARA CARGAR MEMORIA HISTÓRICA ---
+    public void setInitialPrices(Map<String, Double> initialPrices) {
+        this.lastPrices.putAll(initialPrices);
+        System.out.println("[Subscriber] Memoria inicial cargada con " + initialPrices.size() + " precios históricos.");
     }
 
     public void start() {
@@ -85,7 +91,7 @@ public class RealTimeSubscriber {
                     double previousPrice = lastPrices.get(id);
                     double change = ((currentPrice - previousPrice) / previousPrice) * 100;
 
-                    if (Math.abs(change) >= VOLATILITY_THRESHOLD) {
+                    if (Math.abs(change) >= VOLATILITY_THRESHOLD && Math.abs(change) > 0.0) {
 
                         // 1. Construimos el TÍTULO
                         String alertTitle = "🚨 [" + id.toUpperCase() + "] " +

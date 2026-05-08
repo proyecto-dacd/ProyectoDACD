@@ -2,9 +2,13 @@ package org.ulpgc.dacd;
 
 import org.ulpgc.dacd.controller.HistoricalLoader;
 import org.ulpgc.dacd.controller.RealTimeSubscriber;
+import org.ulpgc.dacd.model.CryptoPrice;
 import org.ulpgc.dacd.model.DatamartManager;
 import org.ulpgc.dacd.model.DatamartStore;
 import org.ulpgc.dacd.view.DashboardView;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainBusinessUnit {
     public static void main(String[] args) {
@@ -27,12 +31,28 @@ public class MainBusinessUnit {
         HistoricalLoader historicalLoader = new HistoricalLoader(datamartStore);
         historicalLoader.loadHistoricalData(datalakePath);
 
-        // 4. Crear y mostrar la Interfaz Gráfica (View)
+        // --- LA MAGIA: CONECTANDO EL PASADO CON EL PRESENTE ---
+
+        // 4. Extraer el último estado conocido desde SQLite
+        Map<String, CryptoPrice> initialData = datamartStore.getLatestPrices();
+        Map<String, Double> memoryPrices = new HashMap<>(); // Mapa temporal para el Subscriber
+
+        // 5. Crear la Interfaz Gráfica (View)
         DashboardView dashboardView = new DashboardView();
+
+        // 6. Rellenar la tabla y preparar la memoria ANTES de mostrar la ventana
+        for (CryptoPrice cp : initialData.values()) {
+            dashboardView.updatePrice(cp.id(), cp.price(), cp.timestamp());
+            memoryPrices.put(cp.id(), cp.price());
+        }
+
+        // Ahora sí, enseñamos la ventana (¡ya aparecerá llena de datos!)
         dashboardView.setVisible(true);
 
-        // 5. Arrancar el Controlador, pasándole la base de datos y la vista
+        // 7. Arrancar el Controlador, pasándole la base de datos y la vista
         RealTimeSubscriber subscriber = new RealTimeSubscriber(datamartStore, dashboardView);
+        // Le pasamos los precios antiguos a su memoria RAM para que pueda comparar
+        subscriber.setInitialPrices(memoryPrices);
         subscriber.start();
     }
 }

@@ -10,4 +10,6 @@ public interface DatamartStore {
     List<String> getRelatedNews(String cryptoId);
 
     void insertNews(CryptoNews cryptoNews);
+
+    java.util.Map<String, CryptoPrice> getLatestPrices();
 }

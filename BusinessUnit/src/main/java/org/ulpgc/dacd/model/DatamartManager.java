@@ -2,7 +2,9 @@ package org.ulpgc.dacd.model;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DatamartManager implements DatamartStore {
 
@@ -104,5 +106,30 @@ public class DatamartManager implements DatamartStore {
         }
 
         return newsList;
+    }
+
+    // --- NUEVO MÉTODO PARA CARGAR LOS PRECIOS INICIALES ---
+    @Override
+    public Map<String, CryptoPrice> getLatestPrices() {
+        Map<String, CryptoPrice> latestPrices = new HashMap<>();
+        // El GROUP BY agrupa por moneda, y el MAX coge solo el más reciente
+        String sql = "SELECT crypto_id, price, MAX(timestamp) as timestamp FROM crypto_prices GROUP BY crypto_id";
+
+        try (Connection conn = connect();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                String id = rs.getString("crypto_id");
+                double price = rs.getDouble("price");
+                String timestamp = rs.getString("timestamp");
+
+                latestPrices.put(id, new CryptoPrice(id, price, timestamp));
+            }
+        } catch (SQLException e) {
+            System.err.println("[Datamart] ❌ Error cargando precios iniciales: " + e.getMessage());
+        }
+
+        return latestPrices;
     }
 }
