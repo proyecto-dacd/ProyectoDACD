@@ -11,7 +11,7 @@
     <modules>
         <module>CoinGecko</module>
         <module>EventStoreBuilder</module>
-        <module>Scraping2</module>
+        <module>Decrypt-Scraper</module>
         <module>BusinessUnit</module>
     </modules>
 
