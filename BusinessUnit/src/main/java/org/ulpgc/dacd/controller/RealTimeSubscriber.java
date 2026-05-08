@@ -23,7 +23,7 @@ public class RealTimeSubscriber {
     private final DashboardView view; // Variable para controlar la interfaz gráfica
 
     // VARIABLES PARA EL VALOR AÑADIDO
-    private static final double VOLATILITY_THRESHOLD = 0.0; // Umbral del 5%
+    private static final double VOLATILITY_THRESHOLD = 0.0; // Umbral del 1% (en 0.0 para pruebas)
     private final Map<String, Double> lastPrices = new HashMap<>();
 
     public RealTimeSubscriber(DatamartStore datamartStore, DashboardView view) {
@@ -86,28 +86,29 @@ public class RealTimeSubscriber {
                     double change = ((currentPrice - previousPrice) / previousPrice) * 100;
 
                     if (Math.abs(change) >= VOLATILITY_THRESHOLD) {
-                        // Construimos el mensaje para el panel de alertas de la interfaz
-                        StringBuilder alertMsg = new StringBuilder();
-                        alertMsg.append("🚨 [").append(id.toUpperCase()).append("] ");
-                        alertMsg.append(change > 0 ? "📈 SUBIÓ " : "📉 BAJÓ ");
-                        alertMsg.append(String.format("%.2f", Math.abs(change))).append("%\n");
 
-                        // Buscamos las noticias en SQLite
+                        // 1. Construimos el TÍTULO
+                        String alertTitle = "🚨 [" + id.toUpperCase() + "] " +
+                                (change > 0 ? "📈 SUBIÓ " : "📉 BAJÓ ") +
+                                String.format("%.2f", Math.abs(change)) + "%";
+
+                        // 2. Construimos el CUERPO de las noticias
+                        StringBuilder newsBody = new StringBuilder();
                         List<String> noticias = datamartStore.getRelatedNews(id);
 
                         if (noticias.isEmpty()) {
-                            alertMsg.append("   -> Sin noticias relacionadas recientes.\n");
+                            newsBody.append("   -> Sin noticias relacionadas recientes.\n");
                         } else {
-                            alertMsg.append("   -> Posibles causas en prensa:\n");
+                            newsBody.append("   -> Posibles causas en prensa:\n");
                             for (String noticia : noticias) {
-                                alertMsg.append("      ").append(noticia).append("\n");
+                                newsBody.append("      ").append(noticia).append("\n");
                             }
                         }
-                        alertMsg.append("--------------------------------------");
+                        newsBody.append("--------------------------------------");
 
-                        // Enviamos el mensaje al panel lateral de la vista
+                        // 3. Enviamos AMBAS partes separadas a la vista
                         boolean isPositive = change > 0;
-                        view.addAlert(alertMsg.toString(), isPositive);
+                        view.addAlert(alertTitle, newsBody.toString(), isPositive);
                     }
                 }
 
@@ -115,17 +116,14 @@ public class RealTimeSubscriber {
                 lastPrices.put(id, currentPrice);
 
             } else if (source.equals("Decrypt-Scraping")) {
-                // --- PARTE NUEVA PARA LAS NOTICIAS ---
                 String title = jsonObject.get("title").getAsString();
                 String url = jsonObject.get("url").getAsString();
                 String ts = jsonObject.get("ts").getAsString();
                 JsonArray coins = jsonObject.getAsJsonArray("coins");
 
-                // Una noticia puede hablar de varias monedas, iteramos sobre el array
                 for (JsonElement coin : coins) {
-                    String cryptoId = coin.getAsString(); // Ej: "bitcoin", "ethereum"
+                    String cryptoId = coin.getAsString();
 
-                    // Creamos el record y lo guardamos en SQLite usando el método nuevo
                     CryptoNews news = new CryptoNews(cryptoId, title, url, ts);
                     datamartStore.insertNews(news);
                 }
