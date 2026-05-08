@@ -1,19 +1,25 @@
 package org.ulpgc.dacd.model;
 
-import java.time.Instant;
-
 public class CurrencyEvent {
     private final String ts;
     private final String ss;
-    private final Object data;
+    private final String id;
+    private final double price;
+    private final long volume;
+    private final long marketCap;
+    private final int rank;
 
-    public CurrencyEvent(Object data, String source) {
-        this.ts = Instant.now().toString();
+    // Modificamos el constructor para recibir los campos sueltos
+    public CurrencyEvent(String source, Currency currency) {
+        this.ts = currency.getTs().toString();
         this.ss = source;
-        this.data = data;
+        this.id = currency.getId();
+        this.price = currency.getPrice();
+        this.volume = currency.getVolume();
+        this.marketCap = currency.getMarketCap();
+        this.rank = currency.getMarketCapRank();
     }
 
     public String getTs() { return ts; }
     public String getSs() { return ss; }
-    public Object getData() { return data; }
 }
