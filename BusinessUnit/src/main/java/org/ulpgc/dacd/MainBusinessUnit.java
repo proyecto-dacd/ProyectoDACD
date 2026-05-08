@@ -18,10 +18,10 @@ public class MainBusinessUnit {
         String datalakePath;
         if (args.length > 0) {
             datalakePath = args[0];
-            System.out.println("📂 Ruta del datalake recibida por argumento: " + datalakePath);
+            System.out.println("Ruta del datalake recibida por argumento: " + datalakePath);
         } else {
             datalakePath = "datalake";
-            System.out.println("⚠️ No se ha proporcionado argumento. Usando ruta por defecto: " + datalakePath);
+            System.out.println("No se ha proporcionado argumento. Usando ruta por defecto: " + datalakePath);
         }
 
         // 2. Iniciar la Base de Datos

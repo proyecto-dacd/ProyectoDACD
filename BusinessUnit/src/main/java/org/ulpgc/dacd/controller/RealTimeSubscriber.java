@@ -26,7 +26,7 @@ public class RealTimeSubscriber {
     private static final double VOLATILITY_THRESHOLD = 0.01; // 1%
     private final Map<String, Double> lastPrices = new HashMap<>();
 
-    // Constructor actualizado con Inyección de Dependencias
+    // Constructor con Inyección de Dependencias
     public RealTimeSubscriber(DatamartStore datamartStore, DashboardView view, SentimentProvider sentimentProvider) {
         this.datamartStore = datamartStore;
         this.view = view;
@@ -68,6 +68,13 @@ public class RealTimeSubscriber {
 
     private void processEvent(String json) {
         try {
+            // LIMPIEZA: Si el mensaje llega con prefijos, nos quedamos solo con el JSON { ... }
+            if (json.contains("{")) {
+                json = json.substring(json.indexOf("{"));
+            } else {
+                return;
+            }
+
             JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
             String source = jsonObject.get("ss").getAsString();
 
@@ -83,21 +90,14 @@ public class RealTimeSubscriber {
                     double previousPrice = lastPrices.get(id);
                     double change = ((currentPrice - previousPrice) / previousPrice) * 100;
 
-                    // Condición: Superar umbral Y que el cambio sea real (distinto de 0)
                     if (Math.abs(change) >= VOLATILITY_THRESHOLD && Math.abs(change) > 0.0) {
-
-                        // Buscamos las noticias relacionadas en el datamart
                         List<String> noticias = datamartStore.getRelatedNews(id);
-
-                        // EXTRA: Analizamos el sentimiento de esas noticias
                         String sentimiento = sentimentProvider.getSentiment(noticias);
 
-                        // 1. Título de la Alerta
                         String alertTitle = "🚨 [" + id.toUpperCase() + "] " +
                                 (change > 0 ? "📈 SUBIÓ " : "📉 BAJÓ ") +
                                 String.format("%.2f", Math.abs(change)) + "%";
 
-                        // 2. Cuerpo de la Alerta con valor añadido
                         StringBuilder newsBody = new StringBuilder();
                         newsBody.append("   -> Sentimiento detectado: ").append(sentimiento).append("\n");
 
@@ -111,7 +111,6 @@ public class RealTimeSubscriber {
                         }
                         newsBody.append("--------------------------------------");
 
-                        // 3. Notificamos a la vista
                         view.addAlert(alertTitle, newsBody.toString(), change > 0);
                     }
                 }
@@ -123,8 +122,13 @@ public class RealTimeSubscriber {
                 String ts = jsonObject.get("ts").getAsString();
                 JsonArray coins = jsonObject.getAsJsonArray("coins");
 
-                for (JsonElement coin : coins) {
-                    datamartStore.insertNews(new CryptoNews(coin.getAsString(), title, url, ts));
+                // MEJORA: Si la noticia no tiene monedas, la guardamos bajo "general"
+                if (coins.size() == 0) {
+                    datamartStore.insertNews(new CryptoNews("general", title, url, ts));
+                } else {
+                    for (JsonElement coin : coins) {
+                        datamartStore.insertNews(new CryptoNews(coin.getAsString(), title, url, ts));
+                    }
                 }
             }
 

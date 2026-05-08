@@ -52,6 +52,13 @@ public class HistoricalLoader {
 
     private void processLine(String line) {
         try {
+            // LIMPIEZA: Si la línea tiene prefijos tipo , nos quedamos solo con el JSON { ... }
+            if (line.contains("{")) {
+                line = line.substring(line.indexOf("{"));
+            } else {
+                return; // Ignorar líneas que no contienen un objeto JSON válido
+            }
+
             JsonObject json = gson.fromJson(line, JsonObject.class);
 
             if (!json.has("ss")) return;
@@ -73,15 +80,19 @@ public class HistoricalLoader {
                 String ts = json.get("ts").getAsString();
                 JsonArray coins = json.getAsJsonArray("coins");
 
-                for (JsonElement coin : coins) {
-                    String cryptoId = coin.getAsString();
-
-                    CryptoNews news = new CryptoNews(cryptoId, title, url, ts);
-                    datamartStore.insertNews(news);
+                // MEJORA: Si la noticia no menciona monedas, la guardamos como "general"
+                // para evitar que se pierda información relevante
+                if (coins.size() == 0) {
+                    datamartStore.insertNews(new CryptoNews("general", title, url, ts));
+                } else {
+                    for (JsonElement coin : coins) {
+                        String cryptoId = coin.getAsString();
+                        CryptoNews news = new CryptoNews(cryptoId, title, url, ts);
+                        datamartStore.insertNews(news);
+                    }
                 }
             }
         } catch (Exception e) {
-            System.err.println("[HistoricalLoader] ⚠️ Error parseando línea: " + line + " -> " + e.getMessage());
         }
     }
 }
