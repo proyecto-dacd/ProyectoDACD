@@ -23,15 +23,13 @@ public class DatamartManager implements DatamartStore {
                 );
                 """;
 
-        String sqlNews = """
-                CREATE TABLE IF NOT EXISTS crypto_news (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    crypto_id TEXT,
-                    title TEXT,
-                    url TEXT,
-                    published_at TEXT UNIQUE
-                );
-                """;
+        String sqlNews = "CREATE TABLE IF NOT EXISTS crypto_news (" +
+                "crypto_id TEXT, " +
+                "title TEXT, " +
+                "url TEXT, " +
+                "published_at TEXT, " +
+                "PRIMARY KEY (crypto_id, url)" + // <--- ESTO ES LO IMPORTANTE
+                ");";
 
         try (Connection conn = connect();
              Statement stmt = conn.createStatement()) {
@@ -65,7 +63,6 @@ public class DatamartManager implements DatamartStore {
 
     @Override
     public void insertNews(CryptoNews cryptoNews) {
-        // Usamos INSERT OR IGNORE para evitar duplicados si la noticia ya existe (por la clave UNIQUE en published_at)
         String sql = "INSERT OR IGNORE INTO crypto_news (crypto_id, title, url, published_at) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = connect();
@@ -78,7 +75,7 @@ public class DatamartManager implements DatamartStore {
 
             int rows = pstmt.executeUpdate();
             if (rows > 0) {
-                System.out.println("[Datamart] ✅ Noticia guardada: " + cryptoNews.title() + " [" + cryptoNews.cryptoId() + "]");
+                System.out.println("[Datamart] ✅ Noticia guardada: " + cryptoNews.title() + " [" + cryptoNews.cryptoId() + "] - " + cryptoNews.publishedAt());
             }
         } catch (SQLException e) {
             System.err.println("[Datamart] ❌ Error al insertar noticia en SQLite: " + e.getMessage());
@@ -89,7 +86,7 @@ public class DatamartManager implements DatamartStore {
     public List<String> getRelatedNews(String cryptoId) {
         List<String> newsList = new ArrayList<>();
         // Busca las últimas 3 noticias de esa criptomoneda
-        String sql = "SELECT title, url FROM crypto_news WHERE crypto_id = ? ORDER BY id DESC LIMIT 3";
+        String sql = "SELECT title, url FROM crypto_news WHERE crypto_id = ? ORDER BY published_at DESC LIMIT 3";
 
         try (Connection conn = connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {

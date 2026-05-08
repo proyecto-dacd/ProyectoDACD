@@ -62,11 +62,15 @@ public class DashboardView extends JFrame {
         });
     }
 
-    // Método para inyectar alertas con color (Verde/Rojo)
-    public void addAlert(String alertMessage, boolean isPositive) {
+    public void addAlert(String title, String body, boolean isPositive) {
         SwingUtilities.invokeLater(() -> {
-            Color textColor = isPositive ? new Color(100, 255, 100) : new Color(255, 100, 100);
-            appendToPane(alertMessage + "\n", textColor);
+            Color titleColor = isPositive ? new Color(100, 255, 100) : new Color(255, 100, 100);
+
+            appendToPane(title + "\n", titleColor);
+
+            Color bodyColor = new Color(200, 200, 200);
+
+            appendToPane(body + "\n", bodyColor);
         });
     }
 
