@@ -20,15 +20,17 @@ public class RealTimeSubscriber {
     private final String topicName = "prediction.crypto";
 
     private final DatamartStore datamartStore;
-    private final DashboardView view; // Variable para controlar la interfaz gráfica
+    private final DashboardView view;
+    private final SentimentProvider sentimentProvider; // Interfaz para el análisis de valor añadido
 
-    // VARIABLES PARA EL VALOR AÑADIDO
-    private static final double VOLATILITY_THRESHOLD = 0.01; // Umbral del 1% (en 0.0 para pruebas)
+    private static final double VOLATILITY_THRESHOLD = 0.01; // 1%
     private final Map<String, Double> lastPrices = new HashMap<>();
 
-    public RealTimeSubscriber(DatamartStore datamartStore, DashboardView view) {
+    // Constructor actualizado con Inyección de Dependencias
+    public RealTimeSubscriber(DatamartStore datamartStore, DashboardView view, SentimentProvider sentimentProvider) {
         this.datamartStore = datamartStore;
         this.view = view;
+        this.sentimentProvider = sentimentProvider;
     }
 
     public void setInitialPrices(Map<String, Double> initialPrices) {
@@ -49,17 +51,14 @@ public class RealTimeSubscriber {
             TopicSubscriber consumer = session.createDurableSubscriber(destination, "Suscripcion-BusinessUnit");
             System.out.println("[Subscriber] Escuchando eventos en tiempo real en: " + topicName);
 
-            consumer.setMessageListener(new MessageListener() {
-                @Override
-                public void onMessage(Message message) {
-                    try {
-                        if (message instanceof TextMessage) {
-                            String json = ((TextMessage) message).getText();
-                            processEvent(json);
-                        }
-                    } catch (JMSException e) {
-                        System.err.println("Error leyendo mensaje JMS: " + e.getMessage());
+            consumer.setMessageListener(message -> {
+                try {
+                    if (message instanceof TextMessage) {
+                        String json = ((TextMessage) message).getText();
+                        processEvent(json);
                     }
+                } catch (JMSException e) {
+                    System.err.println("Error leyendo mensaje JMS: " + e.getMessage());
                 }
             });
         } catch (JMSException e) {
@@ -73,33 +72,34 @@ public class RealTimeSubscriber {
             String source = jsonObject.get("ss").getAsString();
 
             if (source.equals("coin-gecko-feeder")) {
-                // Extraemos los datos del JSON plano
                 String id = jsonObject.get("id").getAsString();
                 double currentPrice = jsonObject.get("price").getAsDouble();
                 String timestamp = jsonObject.get("ts").getAsString();
 
-                // Guardamos el precio en la base de datos SQLite
-                CryptoPrice cryptoPrice = new CryptoPrice(id, currentPrice, timestamp);
-                datamartStore.insertPrice(cryptoPrice);
-
-                // Actualizamos la tabla de la interfaz gráfica
+                datamartStore.insertPrice(new CryptoPrice(id, currentPrice, timestamp));
                 view.updatePrice(id, currentPrice, timestamp);
 
-                // Lógica de Valor Añadido (Detección de Volatilidad)
                 if (lastPrices.containsKey(id)) {
                     double previousPrice = lastPrices.get(id);
                     double change = ((currentPrice - previousPrice) / previousPrice) * 100;
 
+                    // Condición: Superar umbral Y que el cambio sea real (distinto de 0)
                     if (Math.abs(change) >= VOLATILITY_THRESHOLD && Math.abs(change) > 0.0) {
 
-                        // 1. Construimos el TÍTULO
+                        // Buscamos las noticias relacionadas en el datamart
+                        List<String> noticias = datamartStore.getRelatedNews(id);
+
+                        // EXTRA: Analizamos el sentimiento de esas noticias
+                        String sentimiento = sentimentProvider.getSentiment(noticias);
+
+                        // 1. Título de la Alerta
                         String alertTitle = "🚨 [" + id.toUpperCase() + "] " +
                                 (change > 0 ? "📈 SUBIÓ " : "📉 BAJÓ ") +
                                 String.format("%.2f", Math.abs(change)) + "%";
 
-                        // 2. Construimos el CUERPO de las noticias
+                        // 2. Cuerpo de la Alerta con valor añadido
                         StringBuilder newsBody = new StringBuilder();
-                        List<String> noticias = datamartStore.getRelatedNews(id);
+                        newsBody.append("   -> Sentimiento detectado: ").append(sentimiento).append("\n");
 
                         if (noticias.isEmpty()) {
                             newsBody.append("   -> Sin noticias relacionadas recientes.\n");
@@ -111,13 +111,10 @@ public class RealTimeSubscriber {
                         }
                         newsBody.append("--------------------------------------");
 
-                        // 3. Enviamos AMBAS partes separadas a la vista
-                        boolean isPositive = change > 0;
-                        view.addAlert(alertTitle, newsBody.toString(), isPositive);
+                        // 3. Notificamos a la vista
+                        view.addAlert(alertTitle, newsBody.toString(), change > 0);
                     }
                 }
-
-                // Actualizamos la memoria con el nuevo precio
                 lastPrices.put(id, currentPrice);
 
             } else if (source.equals("Decrypt-Scraping")) {
@@ -127,10 +124,7 @@ public class RealTimeSubscriber {
                 JsonArray coins = jsonObject.getAsJsonArray("coins");
 
                 for (JsonElement coin : coins) {
-                    String cryptoId = coin.getAsString();
-
-                    CryptoNews news = new CryptoNews(cryptoId, title, url, ts);
-                    datamartStore.insertNews(news);
+                    datamartStore.insertNews(new CryptoNews(coin.getAsString(), title, url, ts));
                 }
             }
 

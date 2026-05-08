@@ -1,7 +1,9 @@
 package org.ulpgc.dacd;
 
 import org.ulpgc.dacd.controller.HistoricalLoader;
+import org.ulpgc.dacd.controller.KeywordSentimentAnalyzer; // Importante
 import org.ulpgc.dacd.controller.RealTimeSubscriber;
+import org.ulpgc.dacd.controller.SentimentProvider;      // Importante
 import org.ulpgc.dacd.model.CryptoPrice;
 import org.ulpgc.dacd.model.DatamartManager;
 import org.ulpgc.dacd.model.DatamartStore;
@@ -16,9 +18,8 @@ public class MainBusinessUnit {
         String datalakePath;
         if (args.length > 0) {
             datalakePath = args[0];
-            System.out.println("Ruta del datalake recibida por argumento: " + datalakePath);
+            System.out.println("📂 Ruta del datalake recibida por argumento: " + datalakePath);
         } else {
-            // Plan B de seguridad por si se ejecuta sin argumentos
             datalakePath = "datalake";
             System.out.println("⚠️ No se ha proporcionado argumento. Usando ruta por defecto: " + datalakePath);
         }
@@ -46,9 +47,15 @@ public class MainBusinessUnit {
 
         dashboardView.setVisible(true);
 
-        // 7. Arrancar el Controlador, pasándole la base de datos y la vista
-        RealTimeSubscriber subscriber = new RealTimeSubscriber(datamartStore, dashboardView);
-        // Le pasamos los precios antiguos a su memoria RAM para que pueda comparar
+        // --- LAS DOS LÍNEAS CLAVE PARA EL SENTIMIENTO ---
+
+        // 7. Creamos el analizador de sentimiento (puedes cambiarlo aquí en el futuro)
+        SentimentProvider sentimentProvider = new KeywordSentimentAnalyzer();
+
+        // 8. Arrancar el Controlador, pasándole la BD, la vista Y el analizador
+        RealTimeSubscriber subscriber = new RealTimeSubscriber(datamartStore, dashboardView, sentimentProvider);
+
+        // Cargamos la memoria RAM inicial
         subscriber.setInitialPrices(memoryPrices);
         subscriber.start();
     }
