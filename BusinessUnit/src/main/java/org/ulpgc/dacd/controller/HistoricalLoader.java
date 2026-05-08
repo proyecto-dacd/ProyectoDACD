@@ -52,11 +52,10 @@ public class HistoricalLoader {
 
     private void processLine(String line) {
         try {
-            // LIMPIEZA: Si la línea tiene prefijos tipo , nos quedamos solo con el JSON { ... }
             if (line.contains("{")) {
                 line = line.substring(line.indexOf("{"));
             } else {
-                return; // Ignorar líneas que no contienen un objeto JSON válido
+                return;
             }
 
             JsonObject json = gson.fromJson(line, JsonObject.class);
@@ -80,8 +79,6 @@ public class HistoricalLoader {
                 String ts = json.get("ts").getAsString();
                 JsonArray coins = json.getAsJsonArray("coins");
 
-                // MEJORA: Si la noticia no menciona monedas, la guardamos como "general"
-                // para evitar que se pierda información relevante
                 if (coins.size() == 0) {
                     datamartStore.insertNews(new CryptoNews("general", title, url, ts));
                 } else {

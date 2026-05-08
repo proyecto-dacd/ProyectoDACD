@@ -47,15 +47,12 @@ public class MainBusinessUnit {
 
         dashboardView.setVisible(true);
 
-        // --- LAS DOS LÍNEAS CLAVE PARA EL SENTIMIENTO ---
-
-        // 7. Creamos el analizador de sentimiento (puedes cambiarlo aquí en el futuro)
+        // 7. Creamos el analizador de sentimiento
         SentimentProvider sentimentProvider = new KeywordSentimentAnalyzer();
 
         // 8. Arrancar el Controlador, pasándole la BD, la vista Y el analizador
         RealTimeSubscriber subscriber = new RealTimeSubscriber(datamartStore, dashboardView, sentimentProvider);
 
-        // Cargamos la memoria RAM inicial
         subscriber.setInitialPrices(memoryPrices);
         subscriber.start();
     }

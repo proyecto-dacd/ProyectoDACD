@@ -23,10 +23,9 @@ public class RealTimeSubscriber {
     private final DashboardView view;
     private final SentimentProvider sentimentProvider; // Interfaz para el análisis de valor añadido
 
-    private static final double VOLATILITY_THRESHOLD = 0.01; // 1%
+    private static final double VOLATILITY_THRESHOLD = 0.0; // 1%
     private final Map<String, Double> lastPrices = new HashMap<>();
 
-    // Constructor con Inyección de Dependencias
     public RealTimeSubscriber(DatamartStore datamartStore, DashboardView view, SentimentProvider sentimentProvider) {
         this.datamartStore = datamartStore;
         this.view = view;
@@ -68,7 +67,6 @@ public class RealTimeSubscriber {
 
     private void processEvent(String json) {
         try {
-            // LIMPIEZA: Si el mensaje llega con prefijos, nos quedamos solo con el JSON { ... }
             if (json.contains("{")) {
                 json = json.substring(json.indexOf("{"));
             } else {
@@ -122,7 +120,6 @@ public class RealTimeSubscriber {
                 String ts = jsonObject.get("ts").getAsString();
                 JsonArray coins = jsonObject.getAsJsonArray("coins");
 
-                // MEJORA: Si la noticia no tiene monedas, la guardamos bajo "general"
                 if (coins.size() == 0) {
                     datamartStore.insertNews(new CryptoNews("general", title, url, ts));
                 } else {
