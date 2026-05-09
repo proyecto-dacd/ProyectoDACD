@@ -1,0 +1,10 @@
+{"ts":"2026-05-09T16:03:48.388Z","ss":"coin-gecko-feeder","id":"bitcoin","price":68286.0,"volume":19273940354,"marketCap":1367814676087,"rank":1}
+{"ts":"2026-05-09T16:03:51.139Z","ss":"coin-gecko-feeder","id":"ethereum","price":1965.39,"volume":11971253819,"marketCap":237219355494,"rank":2}
+{"ts":"2026-05-09T16:03:48.392Z","ss":"coin-gecko-feeder","id":"tether","price":0.848169,"volume":40253572152,"marketCap":160893085736,"rank":3}
+{"ts":"2026-05-09T16:03:48.756Z","ss":"coin-gecko-feeder","id":"ripple","price":1.2,"volume":1275543956,"marketCap":74121230311,"rank":4}
+{"ts":"2026-05-09T16:03:48.127Z","ss":"coin-gecko-feeder","id":"binancecoin","price":549.05,"volume":686197992,"marketCap":74049543753,"rank":5}
+{"ts":"2026-05-09T16:03:48.777Z","ss":"coin-gecko-feeder","id":"usd-coin","price":0.848143,"volume":7854582970,"marketCap":66052796713,"rank":6}
+{"ts":"2026-05-09T16:03:48.078Z","ss":"coin-gecko-feeder","id":"solana","price":78.85,"volume":3247967110,"marketCap":45525621824,"rank":7}
+{"ts":"2026-05-09T16:03:41.299Z","ss":"coin-gecko-feeder","id":"tron","price":0.298418,"volume":421959305,"marketCap":28276732726,"rank":8}
+{"ts":"2026-05-09T16:03:45.184Z","ss":"coin-gecko-feeder","id":"figure-heloc","price":0.872888,"volume":145538322,"marketCap":15338741998,"rank":9}
+{"ts":"2026-05-09T16:03:46.151Z","ss":"coin-gecko-feeder","id":"dogecoin","price":0.092094,"volume":774215826,"marketCap":14201001180,"rank":10}
