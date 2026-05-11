@@ -8,8 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class FileEventStore implements EventStore {
     private final String baseDirectory;
@@ -24,7 +22,9 @@ public class FileEventStore implements EventStore {
             JsonObject jsonObject = JsonParser.parseString(eventJson).getAsJsonObject();
             String source = jsonObject.get("ss").getAsString();
 
-            String date = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE);
+            String ts = jsonObject.get("ts").getAsString();
+
+            String date = ts.substring(0, 10).replace("-", "");
 
             String directoryPath = baseDirectory + "/events/" + topic + "/" + source;
             String filePath = directoryPath + "/" + date + ".events";

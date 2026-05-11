@@ -24,23 +24,21 @@ public class ActiveMQSubscriber {
 
             TopicSubscriber consumer = session.createDurableSubscriber(destination, "Suscripcion-DataLake");
 
-            System.out.println("Escuchando (Duradero) en: " + topicName);
+            System.out.println("[EventStoreBuilder] Escuchando (Duradero) en: " + topicName);
 
-            consumer.setMessageListener(new MessageListener() {
-                @Override
-                public void onMessage(Message message) {
-                    try {
-                        if (message instanceof TextMessage) {
-                            String json = ((TextMessage) message).getText();
-                            eventStore.save(topicName, json);
-                        }
-                    } catch (JMSException e) {
-                        e.printStackTrace();
+            consumer.setMessageListener(message -> {
+                try {
+                    if (message instanceof TextMessage) {
+                        String json = ((TextMessage) message).getText();
+                        eventStore.save(topicName, json);
                     }
+                } catch (JMSException e) {
+                    System.err.println("[EventStoreBuilder] Error procesando mensaje JMS: " + e.getMessage());
                 }
             });
+
         } catch (JMSException e) {
-            e.printStackTrace();
+            System.err.println("[EventStoreBuilder] Error conectando a ActiveMQ: " + e.getMessage());
         }
     }
 }
