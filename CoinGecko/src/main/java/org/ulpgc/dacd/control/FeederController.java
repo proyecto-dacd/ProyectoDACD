@@ -35,7 +35,7 @@ public class FeederController {
             } catch (Exception e) {
                 view.displayError("Error programado: " + e.getMessage());
             }
-        }, 0, 5, TimeUnit.MINUTES);
+        }, 0, 30, TimeUnit.MINUTES);
     }
 
     public void executeManualRefresh() {
@@ -47,9 +47,7 @@ public class FeederController {
                 return;
             }
 
-            // Dentro del bucle for de executeManualRefresh():
             for (Currency currency : currencies) {
-                // El nuevo constructor ya se encarga de "aplanar" internamente
                 CurrencyEvent event = new CurrencyEvent("coin-gecko-feeder", currency);
                 publisher.publish(event);
             }

@@ -1,6 +1,7 @@
 package org.ulpgc.dacd.model;
 
 import java.util.List;
+import java.util.Map;
 
 public interface DatamartStore {
     void initializeDatamart();
@@ -11,5 +12,5 @@ public interface DatamartStore {
 
     void insertNews(CryptoNews cryptoNews);
 
-    java.util.Map<String, CryptoPrice> getLatestPrices();
+    Map<String, CryptoPrice> getLatestPrices();
 }

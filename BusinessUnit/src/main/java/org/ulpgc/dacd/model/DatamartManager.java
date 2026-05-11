@@ -30,7 +30,7 @@ public class DatamartManager implements DatamartStore {
                 "title TEXT, " +
                 "url TEXT, " +
                 "published_at TEXT, " +
-                "PRIMARY KEY (crypto_id, url)" + // <--- ESTO ES LO IMPORTANTE
+                "PRIMARY KEY (crypto_id, url)" +
                 ");";
 
         try (Connection conn = connect();

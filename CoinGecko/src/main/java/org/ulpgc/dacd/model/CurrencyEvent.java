@@ -9,7 +9,6 @@ public class CurrencyEvent {
     private final long marketCap;
     private final int rank;
 
-    // Modificamos el constructor para recibir los campos sueltos
     public CurrencyEvent(String source, Currency currency) {
         this.ts = currency.getTs().toString();
         this.ss = source;
