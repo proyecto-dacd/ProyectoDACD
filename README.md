@@ -19,15 +19,17 @@ masivo de datos. El sistema integra tres flujos de información críticos:
 La principal ventaja competitiva de esta herramienta no es solo la visualización de datos, sino la generación de 
 conocimiento accionable para el usuario:
 
-    - Detección de Volatilidad Contextual: El sistema identifica variaciones de precio superiores al 1% y, de forma inmediata, busca noticias relacionadas en el datamart para explicar el movimiento.
-    
-    - Análisis de Sentimiento: Mediante un motor de procesamiento de lenguaje natural basado en palabras clave, la plataforma asigna un sentimiento (Positivo, Negativo o Neutro) a las causas de la volatilidad, permitiendo al inversor tomar decisiones informadas rápidamente.
+    - Correlación de Pearson (Sentimiento vs. Precio): A diferencia de los monitores convencionales, el sistema implementa el Índice de Pearson (r) en tiempo real. Esto permite al usuario cuantificar matemáticamente la fuerza de la relación entre el sentimiento de las noticias y la fluctuación del mercado, identificando de forma objetiva anomalías o divergencias de precio.
 
-    - Integridad y Resiliencia: Gracias al uso de suscriptores duraderos, garantizamos que no se pierda ni un solo dato de mercado durante caídas del sistema o paradas de mantenimiento, asegurando un histórico continuo y fiable.
+    - Análisis de Sentimiento Automatizado: Mediante un motor de procesamiento de lenguaje natural basado en heurística de palabras clave, la plataforma categoriza el impacto emocional del flujo de noticias. Esto permite filtrar el "ruido" del mercado y centrarse en eventos con una carga sentimental alta (alcista o bajista).
 
-    - Arquitectura de Datos Unificada: Combinamos el almacenamiento masivo de eventos históricos con el procesamiento en tiempo real, ofreciendo al usuario una transición fluida entre los datos del pasado y la actividad en vivo del mercado.
+    - Resiliencia y Sincronización: El sistema garantiza la integridad absoluta del historial de mercado. Gracias al uso de suscriptores duraderos en el middleware (ActiveMQ), la plataforma es capaz de realizar una lógica de catch-up automático. Si el sistema se desconecta, al reiniciarse procesa instantáneamente todos los eventos acumulados, eliminando cualquier brecha de información en el Datamart.
 
-    - Versatilidad de Interfaz: El sistema ofrece flexibilidad de visualización mediante una interfaz gráfica detallada para análisis visual y una interfaz de consola (CLI) para una monitorización técnica y ligera.
+    - Implementación de Arquitectura Lambda: El diseño combina un flujo de procesamiento por lotes (Batch) para el análisis de datos históricos masivos con un flujo de velocidad (Speed Layer) para la respuesta inmediata. El resultado es una transición fluida donde el usuario puede analizar tendencias pasadas y movimientos en vivo bajo un mismo modelo de datos unificado.
+
+    - Alertas de Volatilidad Contextualizadas: El sistema no solo avisa cuando el precio cambia, ofrece el porqué. Al detectar variaciones superiores al umbral configurado, la plataforma vincula automáticamente el movimiento con la última noticia relevante y su puntuación de sentimiento, reduciendo drásticamente el tiempo de reacción del analista.
+
+    - Visualización Analítica de Alta Densidad (Dashboard Real-Time): El sistema traslada la complejidad del procesamiento de datos a una interfaz web intuitiva y dinámica. Mediante el uso de WebSockets y actualizaciones reactivas, el Dashboard ofrece una supervisión manos libres donde widgets especializados (velocímetros de Pearson, indicadores de sentimiento y gráficos de tendencia) se sincronizan al milisegundo con los eventos del mercado. Esta capacidad permite al usuario detectar patrones visuales de forma inmediata sin necesidad de interactuar manualmente con la plataforma.
 
 ## 3. Justificación de Tecnologías y Estructura de Datamart
 
@@ -39,11 +41,25 @@ conocimiento accionable para el usuario:
 
 ### 3.2. Estructura del Datamart (SQLite)
 
-    - Persistencia y Relación: A diferencia de una solución en memoria, SQLite permite que los datos sobrevivan a reinicios de la Business Unit y facilita consultas complejas para unir precios y noticias mediante el identificador único de la criptomoneda.
+El Datamart ha sido diseñado siguiendo principios de normalización para garantizar la consistencia entre el flujo de precios y el de noticias, permitiendo una analítica cruzada eficiente.
 
-    - Integridad de Datos: Se han definido claves primarias compuestas en la tabla de noticias para evitar la duplicidad de información. El uso de la instrucción INSERT OR IGNORE optimiza el rendimiento del sistema al descartar automáticamente eventos ya procesados, reduciendo el consumo de recursos en disco.
+#### Modelado de Datos
 
-    - Eficiencia en Consultas: La estructura permite recuperar rápidamente los 10 precios más recientes para las alertas de volatilidad, garantizando una respuesta fluida de la interfaz de usuario.
+    - Tabla de Precios (prices): Almacena el histórico de cotizaciones, incluyendo el timestamp preciso y la métrica de sentimiento calculada en el momento de la ingesta. Esto permite reconstruir la evolución del mercado con contexto emocional.
+
+    - Tabla de Noticias (news): Almacena el contenido informativo. Se utiliza una Clave Primaria Compuesta para asegurar la unicidad, evitando que una misma noticia procesada por diferentes fuentes duplique el ruido en el análisis.
+
+#### Estrategias de Optimización e Integridad
+
+    - Persistencia Robusta: El uso de SQLite garantiza que el estado de la Business Unit sea persistente. Tras un reinicio, el sistema puede recuperar instantáneamente los últimos estados para reanudar el cálculo del Índice de Pearson sin tiempos de espera.
+
+    - Resolución de Conflictos (INSERT OR IGNORE): Se implementa una lógica de inserción no bloqueante. El sistema descarta automáticamente registros duplicados a nivel de base de datos, lo que optimiza el ciclo de escritura y garantiza que el Datalake y el Datamart mantengan una sincronía limpia.
+
+    - Eficiencia en Consultas de Ventana: La estructura de índices permite realizar consultas de ventana deslizante con latencia mínima. Esto es crítico para que el Dashboard recalcule la volatilidad y los promedios móviles en tiempo real cada vez que el broadcastUpdate() se activa.
+
+#### Relación Semántica
+
+    - El diseño permite realizar vínculos temporales: el sistema busca noticias cuya publicación coincida con ventanas de volatilidad detectadas. Esto permite la contextualización automática en la interfaz web, explicando al usuario el "porqué" de un movimiento de mercado mediante el cruce de datos de ambas tablas.
 
 ## 4. Instrucciones claras para compilar y ejecutar cada módulo
 
