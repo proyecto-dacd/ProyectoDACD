@@ -10,5 +10,5 @@ public record MarketIndicators(
         List<Double> priceHistory,
         List<String> timestampHistory,
         double priceChange,
-        boolean isVolatile // <--- Añadido
+        boolean isVolatile
 ) {}

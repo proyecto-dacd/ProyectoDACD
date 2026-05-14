@@ -35,7 +35,7 @@ public class FeederController {
             } catch (Exception e) {
                 view.displayError("Error programado: " + e.getMessage());
             }
-        }, 0, 30, TimeUnit.MINUTES);
+        }, 0, 2, TimeUnit.MINUTES);
     }
 
     public void executeManualRefresh() {
