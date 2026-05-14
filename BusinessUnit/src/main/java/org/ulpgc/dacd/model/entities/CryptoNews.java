@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.model;
+package org.ulpgc.dacd.model.entities;
 
 public record CryptoNews(
         String cryptoId,

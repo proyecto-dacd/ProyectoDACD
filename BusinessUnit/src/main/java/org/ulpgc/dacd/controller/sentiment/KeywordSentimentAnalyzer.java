@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.controller;
+package org.ulpgc.dacd.controller.sentiment;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,4 +1,7 @@
-package org.ulpgc.dacd.model;
+package org.ulpgc.dacd.model.persistence;
+
+import org.ulpgc.dacd.model.entities.CryptoNews;
+import org.ulpgc.dacd.model.entities.CryptoPrice;
 
 import java.util.List;
 import java.util.Map;
