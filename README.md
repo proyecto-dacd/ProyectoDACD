@@ -103,5 +103,119 @@ Para asegurar la correcta persistencia y visualización de los datos, se recomie
 
     4. CoinGecko Feeder (MainFeeder): Una vez que todo el sistema de persistencia y análisis está activo, iniciamos el feeder para empezar a recibir las cotizaciones en vivo.
 
+## 5. Arquitectura de sistema y arquitectura de la aplicación.
 
+### 5.1 Arquitectura del Sistema
+
+El sistema sigue un patrón de Arquitectura Lambda, diseñado para procesar grandes volúmenes de datos aprovechando tanto el procesamiento por lotes (batch) como en tiempo real (speed layer).
     
+#### 1. Batch Layer (Capa de Lote)
+
+Esta capa se encarga de la persistencia inmutable de todos los eventos que llegan al sistema.
+
+    - Componente: EventStoreBuilder.
+
+    - Función: Suscribe al bus de mensajes (ActiveMQ) y almacena cada evento (precio o noticia) en un sistema de archivos organizado por origen y fecha (Datalake).
+
+    - Recuperación: Permite reconstruir el estado del sistema desde cero en caso de fallo o necesidad de re-procesamiento mediante el HistoricalLoader.
+
+#### 2. Speed Layer (Capa de Velocidad)
+
+Procesa los datos en cuanto llegan para ofrecer una latencia mínima.
+
+    - Componente: RealTimeSubscriber (dentro de la BusinessUnit).
+
+    - Función: Consume mensajes del tópico prediction.crypto en tiempo real.
+
+    - Acción: Calcula el sentimiento al vuelo y actualiza el Datamart de forma inmediata para que el usuario vea los cambios sin retraso.
+
+#### 3. Serving Layer (Capa de Servicio)
+
+Expone los datos procesados para su consulta.
+
+    - Componente: DashboardApiController.
+
+    - Tecnología: Servidor Javalin con soporte para WebSockets.
+
+    - Función: Combina los datos históricos y en tiempo real para calcular indicadores como el Índice de Pearson y servirlos mediante una API REST y notificaciones push.
+
+### 5.2 Arquitectura de la Aplicación
+
+#### 1. Feeder (CoinGecko)
+
+    - Extrae precios en tiempo real de la API de CoinGecko.
+
+    - Inyecta las dependencias necesarias (Reader, Publisher, View) desde su Main.
+
+#### 2. Scraper (Decrypt)
+
+    - Realiza Web Scraping de noticias cripto del portal Decrypt.
+
+    - Valida y publica las noticias en el bus de mensajes.
+
+#### 3. Event Store
+
+    - Actúa como el guardián de los datos brutos, asegurando que nada se pierda en el Datalake.
+
+#### 4. Business Unit
+
+    - El núcleo analítico. Gestiona la base de datos SQLite (Datamart), calcula sentimientos y correlaciones, y ofrece la interfaz visual.
+
+### 5.3 Diagramas de Clases
+
+#### 1. Diagrama del Feeder
+
+![Diagrama de Clases - CoinGecko](images/MainFeeder.png)
+
+#### 2. Diagrama MainEvent
+
+![Diagrama de Clases - MainEvent](images/MainEvent.png)
+
+#### 3. Diagrama MainBusinessUnit
+
+![Diagrama de Clases - MainBusinessUnit](images/MainBusinessUnit.png)
+
+## 6. Tecnologías Utilizadas
+
+Este proyecto integra diversas tecnologías para cubrir todo el ciclo de vida del dato, desde la ingesta hasta la visualización.
+
+### Lenguajes y Entorno
+
+    - Java 21+: Lenguaje principal de desarrollo, utilizando características modernas como Records para definir entidades de datos de forma concisa.
+
+    - Maven: Motor de construcción y gestión de dependencias para todos los módulos del proyecto.
+
+    - HTML/CSS/JavaScript: Tecnologías base para el desarrollo del dashboard visual.
+
+### Comunicación y Mensajería
+
+    - Apache ActiveMQ: Broker de mensajería utilizado para el paso de mensajes asíncrono entre módulos. Implementa un modelo de Publicación/Suscripción (Topic) para distribuir precios y noticias.
+
+### Almacenamiento de Datos
+
+    - SQLite (JDBC): Base de datos relacional ligera utilizada en el Datamart de la BusinessUnit para almacenar el estado procesado del sistema.
+
+    - Sistema de Archivos (Datalake): Almacenamiento inmutable en formato .events para persistir todos los eventos brutos recibidos, permitiendo el re-procesamiento histórico.
+
+### Frameworks y Librerías de API
+
+    - Javalin: Framework web ligero para Java utilizado para crear la API REST y gestionar las conexiones WebSockets en tiempo real.
+
+    - Gson (Google): Librería para la serialización y deserialización de objetos Java a formato JSON, esencial para el intercambio de mensajes y almacenamiento de eventos.
+
+### Visualización y Análisis
+
+    - WebSockets: Protocolo utilizado para la comunicación bidireccional entre el servidor y el navegador, permitiendo actualizaciones instantáneas en el dashboard.
+
+    - Lógica Estadística: Implementación personalizada del Índice de Correlación de Pearson para analizar la relación entre el sentimiento de las noticias y el precio de las criptomonedas
+
+### Como se conectan
+
+    1. El Feeder y el Scraper generan eventos en Java y los envían a ActiveMQ en formato JSON mediante Gson.
+
+    2. El Event Store escucha estos mensajes y los guarda físicamente en el Datalake.
+
+    3. La Business Unit consume los mensajes de ActiveMQ, realiza cálculos de sentimiento y persiste los resultados en SQLite.
+
+    4. Finalmente, Javalin sirve esos datos a través de una API, y mediante WebSockets avisa al frontend para que se actualice sin refrescar la página.
+
