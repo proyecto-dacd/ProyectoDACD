@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.infrastructure.broker;
+package org.ulpgc.dacd.controller.infrastructure.broker;
 
 import com.google.gson.Gson;
 import org.apache.activemq.ActiveMQConnectionFactory;

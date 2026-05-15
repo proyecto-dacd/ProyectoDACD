@@ -1,4 +1,4 @@
-package org.ulpgc.dacd.infrastructure.scraper;
+package org.ulpgc.dacd.controller.infrastructure.scraper;
 
 import org.jsoup.nodes.Document;
 import org.ulpgc.dacd.model.NewsArticle;

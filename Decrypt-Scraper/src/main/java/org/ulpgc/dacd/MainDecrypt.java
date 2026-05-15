@@ -1,8 +1,8 @@
     package org.ulpgc.dacd;
 
     import org.ulpgc.dacd.controller.NewsController;
-    import org.ulpgc.dacd.infrastructure.scraper.DecryptNewsFeeder;
-    import org.ulpgc.dacd.infrastructure.scraper.NewsFeeder;
+    import org.ulpgc.dacd.controller.infrastructure.scraper.DecryptNewsFeeder;
+    import org.ulpgc.dacd.controller.infrastructure.scraper.NewsFeeder;
 
     import java.util.concurrent.Executors;
     import java.util.concurrent.ScheduledExecutorService;

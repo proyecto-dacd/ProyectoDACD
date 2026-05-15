@@ -1,8 +1,8 @@
 package org.ulpgc.dacd.controller;
 
-import org.ulpgc.dacd.infrastructure.scraper.NewsFeeder;
+import org.ulpgc.dacd.controller.infrastructure.scraper.NewsFeeder;
 import org.ulpgc.dacd.model.NewsArticle;
-import org.ulpgc.dacd.infrastructure.broker.ActiveMQNewsPublisher;
+import org.ulpgc.dacd.controller.infrastructure.broker.ActiveMQNewsPublisher;
 import org.ulpgc.dacd.model.CurrencyEvent;
 
 import java.util.List;
