@@ -78,12 +78,18 @@ El Datamart ha sido diseñado siguiendo principios de normalización para garant
 Antes de ejecutar los módulos, es obligatorio crear un archivo llamado **config.properties** en la raíz del proyecto
 con el siguiente contenido:
 
+Dicho archivo tendrá que ser pasado por argumento al mainFeeder.
+
     # ProyectoDACD/config.properties
     api_key=TU_API_KEY_AQUI
+
+![RuraRelativa2](images/RutaRelativa2.png)
 
 Debes definir una ruta en tu sistema de archivos (**datalake**) donde se almacenarán los eventos en formato NDJSON.
 
     Esta misma ruta debe ser proporcionada como argumento tanto al EventStoreBuilder para la escritura, como a la BusinessUnit para la carga del histórico.
+
+![RuraRelativa](images/RutaRelativa.png)
 
     El sistema creará automáticamente la estructura interna de carpetas (/events/topic/source/) dentro de esta ruta al recibir los primeros mensajes.
 
@@ -218,4 +224,92 @@ Este proyecto integra diversas tecnologías para cubrir todo el ciclo de vida de
     3. La Business Unit consume los mensajes de ActiveMQ, realiza cálculos de sentimiento y persiste los resultados en SQLite.
 
     4. Finalmente, Javalin sirve esos datos a través de una API, y mediante WebSockets avisa al frontend para que se actualice sin refrescar la página.
+
+## 7. Principios y Patrones de Diseño Aplicados
+
+El desarrollo de este sistema se ha fundamentado en estándares de ingeniería de software para asegurar un código mantenible, escalable y robusto.
+
+### Principios de SOLID
+
+    - Responsabilidad Única: Cada clase y módulo aborda una única razón para cambiar. Por ejemplo, el Feeder solo gestiona la obtención de datos, mientras que el EventStore se dedica exclusivamente a la persistencia inmutable en el Datalake.
+
+    - Abierto/Cerrado: El sistema permite extender funcionalidades sin modificar el código existente. Gracias al uso de interfaces, se pueden añadir nuevos proveedores de sentimiento o fuentes de datos sin alterar la lógica de los suscriptores.
+
+    - Inversión de Dependencias: Los módulos de alto nivel (como los controladores) no dependen de implementaciones concretas, sino de abstracciones (interfaces). Se aplica Inyección de Dependencias a través de los constructores para facilitar el desacoplamiento
+
+    - Segregación de Interfaces: Se han definido interfaces específicas y pequeñas, como DatamartStore o SentimentProvider, evitando obligar a las clases a implementar métodos que no necesitan.
+
+### Patrones de Diseño
+
+    - Observer (Publish-Subscribe): Implementado a través de ActiveMQ. Define un mecanismo donde múltiples consumidores (Business Unit, Event Store) se suscriben a un tema para recibir notificaciones sobre nuevos eventos de un objeto observado (el Feeder/Scraper).
+
+    - Strategy: Las interfaces como SentimentProvider permiten intercambiar algoritmos de análisis (como el KeywordSentimentAnalyzer) de forma transparente para el cliente que las utiliza.
+
+    - Event Sourcing: En lugar de almacenar solo el estado final, el sistema registra toda la serie de eventos en un almacén de solo adición. Esto permite la reconstrucción completa del estado del sistema desde cero a partir del historial de eventos.
+
+### Estilo Arquitectónico: Model-View-Controller (MVC)
+
+Se ha aplicado el patrón MVC de forma integral en los cuatro módulos del sistema para garantizar la separación de intereses y facilitar la evolución independiente de cada componente
+
+#### Model
+
+Contiene la funcionalidad principal, las reglas de dominio y los datos.
+
+    - Feeders (CoinGecko/Decrypt): Representado por los records inmutables de precios y noticias que capturan la realidad del mercado.
+
+    - Business Unit: Gestionado por el DatamartManager, que estructura la información procesada para su consulta.
+
+#### View
+
+Responsable de la representación de la información al usuario o al sistema.
+
+    - Feeders y Event Store: Utilizan una Vista Pasiva mediante la consola o logs del sistema. Esto elimina dependencias mutuas y asegura que la lógica de aplicación no se vea afectada por la forma en que se muestran los mensajes de estado.
+
+    - Business Unit: La vista reside en el frontend web (index.html), encargada de recolectar y mostrar la información procesada mediante gráficas dinámicas.
+
+#### Controller
+
+Maneja la entrada, coordina la comunicación y ejecuta la lógica de aplicación.
+
+    - Feeders (CoinGecko/Decrypt): Los controladores orquestan la lectura de las fuentes y la publicación en el bus de mensajes.
+
+    - Event Store: El suscriptor de ActiveMQ actúa como controlador de persistencia, capturando eventos y dirigiendo su escritura en el almacén de solo adición.
+
+    - En Business Unit: Está compuesto por tres controladores especializados que inyectan o consultan datos en el modelo
+
+        - RealTimeSubscriber: Controlador de ingesta en tiempo real. Escucha el bus de mensajes y decide qué datos deben persistirse en el Datamart.
+
+        - HistoricalLoader: Controlador de carga por lotes (Batch). Orquesta el traspaso masivo de información desde el Datalake hacia el Datamart al inicio del sistema.
+
+        - DashboardApiController: Controlador de interfaz y API. Gestiona las peticiones HTTP del usuario y coordina la actualización de la vista mediante WebSockets.
+
+### Clean Code y Modelado
+
+    - Objetos Inmutables (Records): Se utilizan records de Java para entidades como CryptoPrice y CryptoNews. Estos objetos son inmutables por definición, lo que garantiza seguridad en hilos y facilita las pruebas al tener un estado invariable.
+
+    - Nombres Significativos: Las variables, clases y métodos siguen una nomenclatura que explica por sí misma su intención, evitando prefijos innecesarios y manteniendo la consistencia en todo el proyecto.
+
+    - Funciones Pequeñas y Especializadas: Los métodos en clases como HistoricalLoader están divididos en tareas pequeñas con una única responsabilidad, facilitando su lectura de arriba hacia abajo como una narrativa.
+
+    - Separación de Comando y Consulta: Se procura que las funciones modifiquen el estado o retornen información, pero no ambas cosas simultáneamente, para mejorar la predictibilidad del código.
+
+## 8. Ejemplos de Uso
+
+### 8.1. Dashboard en Tiempo Real
+
+Una vez iniciados todos los módulos, el sistema es accesible a través del navegador
+
+    - URL: http://localhost:7070
+
+    - Funcionamiento: La vista utiliza WebSockets para recibir notificaciones del DashboardApiController. Al recibir un evento, el dashboard se actualiza automáticamente sin necesidad de refrescar la página, mostrando gráficas de precio, indicadores de sentimiento y el cálculo de Pearson.
+
+### 8.2 EndPoints de la API
+
+El controlador expone los siguientes puntos de acceso para la consulta de información procesada
+
+    - Get: /api/monedas | /api/noticias/{id} | /api/indicadores/{id}
+
+Ejemplo de respuesta (JSON) para /api/indicadores/bitcoin
+
+![Ejemplo Uso](images/EjemploUso.png)
 
