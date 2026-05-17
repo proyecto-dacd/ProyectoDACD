@@ -59,7 +59,7 @@ El Datamart ha sido diseñado siguiendo principios de normalización para garant
 
 #### Relación Semántica
 
-    - El diseño permite realizar vínculos temporales: el sistema busca noticias cuya publicación coincida con ventanas de volatilidad detectadas. Esto permite la contextualización automática en la interfaz web, explicando al usuario el "porqué" de un movimiento de mercado mediante el cruce de datos de ambas tablas.
+    - El diseño permite realizar vínculos temporales: El sistema busca noticias cuya publicación coincida con ventanas de volatilidad detectadas. Esto permite la contextualización automática en la interfaz web, explicando al usuario el "porqué" de un movimiento de mercado mediante el cruce de datos de ambas tablas.
 
 ## 4. Instrucciones claras para compilar y ejecutar cada módulo
 
@@ -180,6 +180,10 @@ Expone los datos procesados para su consulta.
 #### 3. Diagrama MainBusinessUnit
 
 ![Diagrama de Clases - MainBusinessUnit](images/MainBusinessUnit.png)
+
+#### 4. Diagrama MainDecrypt
+
+![Diagrama de Clases - MainBusinessUnit](images/MainDecrypt.png)
 
 ## 6. Tecnologías Utilizadas
 

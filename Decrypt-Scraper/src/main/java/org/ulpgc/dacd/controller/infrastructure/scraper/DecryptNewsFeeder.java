@@ -11,13 +11,13 @@ public class DecryptNewsFeeder implements NewsFeeder {
 
     private static final String SECTION_URL = "https://decrypt.co/news";
 
-    private final ScrapingClient2 client;
+    private final DecryptPageClient client;
     private final ArticleUrlExtractor urlExtractor;
     private final DecryptArticleScraper articleScraper;
     private final NewsArticleValidator validator;
 
     public DecryptNewsFeeder() {
-        this.client = new ScrapingClient2();
+        this.client = new DecryptPageClient();
         this.urlExtractor = new ArticleUrlExtractor();
         this.articleScraper = new DecryptArticleScraper(client);
         this.validator = new NewsArticleValidator();

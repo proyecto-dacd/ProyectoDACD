@@ -11,9 +11,9 @@ import java.util.List;
 
 public class DecryptArticleScraper {
 
-    private final ScrapingClient2 client;
+    private final DecryptPageClient client;
 
-    public DecryptArticleScraper(ScrapingClient2 client) {
+    public DecryptArticleScraper(DecryptPageClient client) {
         this.client = client;
     }
 
