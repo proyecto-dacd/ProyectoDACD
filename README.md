@@ -183,7 +183,7 @@ Expone los datos procesados para su consulta.
 
 #### 4. Diagrama MainDecrypt
 
-![Diagrama de Clases - MainBusinessUnit](images/MainDecrypt.png)
+![Diagrama de Clases - MainDecrypt](images/MainDecrypt.png)
 
 ## 6. Tecnologías Utilizadas
 
