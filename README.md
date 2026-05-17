@@ -81,7 +81,7 @@ con el siguiente contenido:
 Dicho archivo tendrá que ser pasado por argumento al mainFeeder.
 
     # ProyectoDACD/config.properties
-    api_key=TU_API_KEY_AQUI
+    api.key=TU_API_KEY_AQUI
 
 ![RuraRelativa2](images/RutaRelativa2.png)
 
